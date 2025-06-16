@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
+    <link rel="stylesheet" href="styles.css">
+    <button id="colorButton">Click to Change Color</button>
+
+    <script>
+        async function fetchButtonColor() {
+            const response = await fetch("http://localhost:8080/buttonColor");
+            const color = await response.text();
+            document.getElementById("colorButton").style.backgroundColor = color;
+        }
+
+        document.getElementById("colorButton").addEventListener("click", fetchButtonColor);
+    </script>
+    <script>
+        async function addTask() {
+            const taskInput = document.getElementById("taskInput").value;
+
+            if (!taskInput) {
+                alert("Please enter a task!");
+                return;
+            }
+
+            const taskData = { Title: taskInput }; // Ensure the JSON structure matches the API model
+
+            await fetch("http://localhost:8080/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(taskData)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            }).then(() => {
+                document.getElementById("taskInput").value = "";
+                fetchData();
+            }).catch(error => {
+                console.error("Error adding task:", error);
+                alert("Failed to add task. Check API logs.");
+            });
+        }
+
+
+
+        async function fetchData() {
+            const response = await fetch("http://localhost:8080/api/tasks");
+            if (!response.ok) {
+                console.error("Error fetching tasks:", await response.text());
+                return;
+            }
+
+            const data = await response.json();
+            let tableBody = document.getElementById("taskTableBody");
+            tableBody.innerHTML = "";
+
+            data.forEach(task => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                                        <td>${task.title}</td>
+                                        <td>${task.description || "No description"}</td>
+                                        <td>${task.status}</td>
+                                        <td>${new Date(task.dueDate).toLocaleDateString()}</td>
+                                    `;
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:8080/chatHub", { transport: signalR.HttpTransportType.WebSockets })
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        connection.start()
+            .then(() => console.log("Connected to SignalR ChatHub!"))
+            .catch(err => console.error("SignalR connection error:", err));
+
+        connection.on("ReceiveMessage", (user, message) => {
+            const chatBox = document.getElementById("chatBox");
+            chatBox.innerHTML += `<p><strong>${user}:</strong> ${message}</p>`;
+        });
+
+        function sendMessage() {
+            const user = document.getElementById("userInput").value;
+            const message = document.getElementById("messageInput").value;
+            if (!user || !message) {
+                alert("Please enter both username and message!");
+                return;
+            }
+            connection.invoke("SendMessage", user, message)
+                .catch(err => console.error("Error sending message:", err));
+            document.getElementById("messageInput").value = "";
+        }
+    </script>
+    <script src="chat.js"></script>
+
+
+</head>
+<body>
+    <h1>Live Chat</h1>
+
+    <div class="chat-container">
+        <div id="chatBox"></div>
+        <input type="text" id="userInput" placeholder="Enter your name">
+        <input type="text" id="messageInput" placeholder="Type a message">
+        <button id="sendMessageButton" onclick="sendMessage()">Send</button>
+    </div>
+    <h1>Task List</h1>
+
+
+    <div class="task-form">
+        <input type="text" id="taskInput" placeholder="Enter task title">
+        <input type="text" id="descriptionInput" placeholder="Enter task description">
+        <input type="date" id="dueDateInput">
+        <button onclick="addTask()">Add Task</button>
+    </div>
+    <button onclick="fetchData()">Load Tasks</button>
+
+    <table class="task-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Due Date</th>
+            </tr>
+        </thead>
+        <tbody id="taskTableBody"></tbody>
+    </table>
+</body>
+</html>
+
+

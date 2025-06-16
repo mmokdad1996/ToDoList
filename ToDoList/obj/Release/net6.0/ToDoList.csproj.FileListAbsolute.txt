@@ -1,0 +1,7 @@
+C:\Users\user\source\repos\ToDoList\ToDoList\obj\Release\net6.0\ToDoList.csproj.AssemblyReference.cache
+C:\Users\user\source\repos\ToDoList\ToDoList\obj\Release\net6.0\ToDoList.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\source\repos\ToDoList\ToDoList\obj\Release\net6.0\ToDoList.AssemblyInfoInputs.cache
+C:\Users\user\source\repos\ToDoList\ToDoList\obj\Release\net6.0\ToDoList.AssemblyInfo.cs
+C:\Users\user\source\repos\ToDoList\ToDoList\obj\Release\net6.0\ToDoList.csproj.CoreCompileInputs.cache
+C:\Users\user\source\repos\ToDoList\ToDoList\obj\Release\net6.0\ToDoList.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\user\source\repos\ToDoList\ToDoList\obj\Release\net6.0\ToDoList.MvcApplicationPartsAssemblyInfo.cache

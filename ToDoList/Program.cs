@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ToDoList.Data;
 using ToDoList.Hubs;
+using ToDoList.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddHostedService<BackgroundTaskService>(); // ✅ Registers background task
 
 // Register SignalR
 builder.Services.AddSignalR();
